@@ -1,0 +1,26 @@
+body {
+    background-image: linear-gradient(#192946, #9aa8c4);
+    /*rgb(0, 2, 105);*/
+}
+
+.header {
+    background-color: #9933cc;
+    color: #ffe4f2;
+    padding: 15px;
+}
+
+#no-select {
+    -webkit-user-select: none;
+    cursor: not-allowed;
+    pointer-events: none;
+    text-align: center;
+    color: white;
+}
+
+.footer {
+    background-color: #0099cc;
+    color: #ffffff;
+    text-align: center;
+    font-size: 12px;
+    padding: 15px;
+}
