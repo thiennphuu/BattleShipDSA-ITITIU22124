@@ -1,80 +1,46 @@
 // Using DFS with a number of island blocks being customizable to generate the random island
+
 var generateIslands = function (islandsCount) {
     var stack = {first: [], second: []};
+    var visited = new Set();
 
-    stack.first.push(floor(random(0, 10)));
-    stack.second.push(floor(random(0, 10)));
+    var startX = floor(random(0, 10));
+    var startY = floor(random(0, 10));
+    stack.first.push(startX);
+    stack.second.push(startY);
+    visited.add(`${startX},${startY}`);
 
     while (islandsCount > 0) {
-        var nodeX;
-        var nodeY;
+        var nodeX = stack.first.pop();
+        var nodeY = stack.second.pop();
 
-        // If the stack is empty and there are islands left to generate,
-        // find a random coordinate that is not already an island.
-        if (stack.first.length === 0 && islandsCount > 0) {
-            while (randomMap[nodeX][nodeY] === ISLAND) {
+        if (randomMap[nodeX][nodeY] !== ISLAND) {
+            randomMap[nodeX][nodeY] = ISLAND;
+            islandsCount--;
+        }
+
+        var neighbors = [];
+        if (nodeX + 1 < 10 && !visited.has(`${nodeX + 1},${nodeY}`)) neighbors.push([nodeX + 1, nodeY]);
+        if (nodeY + 1 < 10 && !visited.has(`${nodeX},${nodeY + 1}`)) neighbors.push([nodeX, nodeY + 1]);
+        if (nodeX - 1 >= 0 && !visited.has(`${nodeX - 1},${nodeY}`)) neighbors.push([nodeX - 1, nodeY]);
+        if (nodeY - 1 >= 0 && !visited.has(`${nodeX},${nodeY - 1}`)) neighbors.push([nodeX, nodeY - 1]);
+
+        if (neighbors.length > 0) {
+            var [nextX, nextY] = neighbors[floor(random(0, neighbors.length))];
+            stack.first.push(nextX);
+            stack.second.push(nextY);
+            visited.add(`${nextX},${nextY}`);
+        } else if (stack.first.length === 0 && islandsCount > 0) {
+            do {
                 nodeX = floor(random(0, 10));
                 nodeY = floor(random(0, 10));
-            }
+            } while (visited.has(`${nodeX},${nodeY}`));
             stack.first.push(nodeX);
             stack.second.push(nodeY);
+            visited.add(`${nodeX},${nodeY}`);
         }
-
-        // Pop the last coordinates from the stack.
-        nodeX = stack.first.pop();
-        nodeY = stack.second.pop();
-
-        // If the popped coordinates are already an island, continue to the next iteration.
-        while (stack.first.length !== 0 && randomMap[nodeX][nodeY] === ISLAND) {
-            nodeX = stack.first.pop();
-            nodeY = stack.second.pop();
-        }
-
-        if (randomMap[nodeX][nodeY] === ISLAND) {
-            continue;
-        }
-
-        // Mark the current coordinates as an island on the randomMap.
-        randomMap[nodeX][nodeY] = ISLAND;
-
-        islandsCount--;
-
-        var ar = [[], []];
-
-        // Check neighboring coordinates and add valid ones to the ar array.
-        if (nodeX + 1 < 10 && randomMap[nodeX + 1][nodeY] !== ISLAND) {
-            ar[0].push(nodeX + 1);
-            ar[1].push(nodeY);
-        }
-        if (nodeY + 1 < 10 && randomMap[nodeX][nodeY + 1] !== ISLAND) {
-            ar[0].push(nodeX);
-            ar[1].push(nodeY + 1);
-        }
-        if (nodeX - 1 >= 0 && randomMap[nodeX - 1][nodeY] !== ISLAND) {
-            ar[0].push(nodeX - 1);
-            ar[1].push(nodeY);
-        }
-        if (nodeY - 1 >= 0 && randomMap[nodeX][nodeY - 1] !== ISLAND) {
-            ar[0].push(nodeX);
-            ar[1].push(nodeY - 1);
-        }
-
-        // Randomly select a coordinate from the ar array.
-        const randNumber = floor(random(0, ar[0].length));
-
-        if (ar[0].length === 0) {
-            continue;
-        }
-
-        // Push the selected coordinate to the stack and remove it from the ar array.
-        stack.first.push(ar[0][randNumber]);
-        stack.second.push(ar[1][randNumber]);
-
-        ar[0].splice(randNumber, 1);
-        ar[1].splice(randNumber, 1);
     }
 };
-
 var drawGeneratedMap = function (randomMap) {
     var indent = 770;
     for (let i = 0; i < 10; i++) {
